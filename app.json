@@ -2,6 +2,7 @@
   "expo": {
     "name": "cumapp",
     "slug": "cumapp",
+    "scheme":"cumapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,10 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eashan20.cumapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c16f2951-ac5a-4b73-b547-1aae826dace9"
+      }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

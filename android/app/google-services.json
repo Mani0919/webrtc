@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "834495022514",
+    "project_id": "cumapp-32941",
+    "storage_bucket": "cumapp-32941.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834495022514:android:641bec553987f62f5d90ab",
+        "android_client_info": {
+          "package_name": "com.eashan20.cumapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "834495022514-t03athl9cgfrf9lb197uf240gkk4stm3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eashan20.cumapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "834495022514-o5l8l838a65l4d3laf7af76gv68fl064.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBggSqQmA5UaFmNQDJ2N1ebRCydmTlu7NQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "834495022514-o5l8l838a65l4d3laf7af76gv68fl064.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
