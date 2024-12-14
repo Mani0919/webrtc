@@ -1,81 +1,165 @@
-import { StatusBar } from "expo-status-bar";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { useEffect } from "react";
-import auth from "@react-native-firebase/auth";
-import AntDesign from '@expo/vector-icons/AntDesign';
-
-export default function App() {
+import {
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Button,
+  FlatList,
+  Linking,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Redirect } from "expo-router";
+import * as Contacts from "expo-contacts";
+import { SafeAreaView } from "react-native-safe-area-context";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import firebase from "firebase/app";
+import { db } from "../firebaseConfig";
+import { collection, addDoc, getDocs } from "@firebase/firestore";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+export default function index() {
+  const [contacts, setContact] = useState([]);
+  const [search, setSearch] = useState("");
+  const [groups, setGroups] = useState([]);
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId:
-        "834495022514-o5l8l838a65l4d3laf7af76gv68fl064.apps.googleusercontent.com",
-    });
+    const fetchContacts = async () => {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status === "granted") {
+        const { data } = await Contacts.getContactsAsync({
+          fields: [Contacts.Fields.Emails, Contacts.Fields.PhoneNumbers],
+        });
+        console.log(data[300]);
+        setContact(data);
+        return data;
+      } else {
+        console.log("Permission not granted");
+        return [];
+      }
+    };
+    fetchContacts();
   }, []);
 
-  async function onGoogleButtonPress() {
-    try {
-      // Check if your device supports Google Play
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-      // Get the users ID token
-      const signInResult = await GoogleSignin.signIn();
-
-      // Try the new style of google-sign in result, from v13+ of that module
-      idToken = signInResult.data?.idToken;
-      console.log(idToken);
-      if (!idToken) {
-        // if you are using older versions of google-signin, try old style result
-        idToken = signInResult.idToken;
-      }
-      if (!idToken) {
-        throw new Error("No ID token found");
-      }
-
-      // Create a Google credential with the token
-      const googleCredential = auth.GoogleAuthProvider.credential(
-        signInResult.data.idToken
+  const filteredContacts = contacts
+    .filter((contact) => contact.contactType === "person") // Filter by 'person' contactType
+    .filter((contact) => {
+      return (
+        !/^[+9876]/.test(contact.name) &&
+        contact.name.toLowerCase().includes(search.toLowerCase())
       );
-      // console.log(googleCredential.us)
-      // Sign-in the user with the credential
-      const userCredential =await auth().signInWithCredential(googleCredential);
-      console.log(userCredential.user)
+    });
 
-      // return user;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const handleout = async () => {
+  const createGroup = async (groupName) => {
     try {
-      const res = await GoogleSignin.signOut();
+      const groupRef = await addDoc(collection(db, "groups"), {
+        name: groupName, // Only the group name is added
+      });
+      console.log("Group created with ID:", groupRef.id);
     } catch (error) {
-      console.log(error);
+      console.error("Error creating group:", error);
+    }
+  };
+  const fetchGroups = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "groups"));
+      const groups = [];
+      querySnapshot.forEach((doc) => {
+        groups.push({ id: doc.id, ...doc.data() }); // Add ID and document data
+      });
+      setGroups(groups); // Return fetched groups
+    } catch (error) {
+      console.error("Error fetching groups:", error);
+      return [];
+    }
+  };
+  const handleCall = (phoneNumber) => {
+    // Check if the phone number is valid
+    if (phoneNumber) {
+      const url = `tel:${phoneNumber}`;
+      Linking.openURL(url).catch((err) =>
+        Alert.alert("Error", "Unable to place call")
+      );
+    } else {
+      Alert.alert(
+        "No phone number",
+        "This contact does not have a valid phone number."
+      );
     }
   };
   return (
-    <View style={styles.container}>
-      <Button
-        title="Google Sign-In"
-        onPress={() =>
-          onGoogleButtonPress().then(() =>
-            console.log("Signed in with Google!")
-          )
-        }
-      />
-      
-      <Button title="sign out" onPress={handleout} />
-    </View>
+    <SafeAreaView className="flex-1">
+      <TouchableOpacity className="flex flex-row items-center justify-end px-7 p-2 mt-5">
+        <Text className="text-[15px]">Groups</Text>
+        <AntDesign
+          name="enter"
+          size={24}
+          color="black"
+          style={{ transform: [{ rotate: "-180deg" }] }}
+        />
+      </TouchableOpacity>
+      <View className="bg-gray-400 mx-3 rounded-md p-2">
+        <TextInput
+          placeholder="search"
+          value={search}
+          onChangeText={(e) => setSearch(e)}
+        />
+      </View>
+
+      {/* <View className="self-end w-32 my-3 rounded-lg">
+          <Button
+            title="group"
+            onPress={() => {
+              fetchGroups();
+            }}
+          />
+        </View>
+        {groups.length === 0 ? (
+          <Text>No groups found</Text>
+        ) : (
+          <FlatList
+            data={groups}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View>
+                <Text>{item.name}</Text>
+              </View>
+            )}
+          />
+        )} */}
+      {/* <View className="self-end w-32 my-3 rounded-lg">
+          <Button
+            title="Create group"
+            onPress={() => {
+              createGroup("family");
+            }}
+          />
+        </View> */}
+      <View className="flex-1 mx-4 p-2">
+        <ScrollView className="flex-1">
+          {filteredContacts.length > 0 ? (
+            filteredContacts.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                className="my-2 py-3 bg-gray-300 flex flex-row justify-between items-center px-6 rounded-md"
+                onPress={() => handleCall(item.phoneNumbers?.[0]?.number)}
+              >
+                <View className=" flex flex-row items-center gap-x-4">
+                  <FontAwesome6 name="user-circle" size={27} color="black" />
+                  <View className="flex flex-col gap-y-2">
+                    <Text className="text-[17px] font-semibold">
+                      {item.name}
+                    </Text>
+                    <Text>{item.phoneNumbers?.[0]?.number}</Text>
+                  </View>
+                </View>
+                <MaterialIcons name="call" size={24} color="#3cb05b" />
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text>No contacts found</Text>
+          )}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
