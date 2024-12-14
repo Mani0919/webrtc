@@ -12,6 +12,14 @@ export default function Root() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="addcandiates"
+          options={{
+            headerShown: false,
+            gestureEnabled: true,
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
     </>
   );

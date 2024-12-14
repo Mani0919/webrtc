@@ -24,6 +24,9 @@ export default function Root() {
             headerShown: false,
           }}
         />
+        <Stack.Screen name="landingscreen" options={{
+          headerShown:false
+        }}/>
       </Stack>
     </>
   );
