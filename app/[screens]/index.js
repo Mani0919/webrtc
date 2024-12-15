@@ -10,14 +10,19 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { router } from "expo-router";
+import { Link, router, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { collection, addDoc, getDocs, deleteDoc } from "@firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { images } from "../../constants/images";
 export default function index() {
+  const router = useRouter();
   const [groups, setGroups] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [groupdetails, setGroupDetails] = useState({
+    id: "",
+    name: "",
+  });
   useEffect(() => {
     fetchGroups();
   }, []);
@@ -28,6 +33,7 @@ export default function index() {
       querySnapshot.forEach((doc) => {
         groups.push({ id: doc.id, ...doc.data() }); // Add ID and document data
       });
+      console.log(groups);
       setGroups(groups); // Return fetched groups
     } catch (error) {
       console.error("Error fetching groups:", error);
@@ -35,7 +41,13 @@ export default function index() {
     }
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (id, name) => {
+    console.log("rrr", id, name);
+    setGroupDetails((prev) => ({
+      ...prev,
+      id: id,
+      name: name,
+    }));
     setShowModal(true); // Open modal
   };
 
@@ -66,7 +78,12 @@ export default function index() {
           keyExtractor={(item) => item.id}
           className="p-3 mt-7"
           renderItem={({ item }) => (
-            <TouchableOpacity className=" h-10" onPress={handleOpenModal}>
+            <TouchableOpacity
+              className=" h-10"
+              onPress={() => {
+                handleOpenModal(item.id, item.name);
+              }}
+            >
               <View className="flex flex-row items-center gap-x-3 w-32 h-full ">
                 {item.name == "family" && (
                   <Image source={images.family} className="w-7 h-7" />
@@ -104,18 +121,26 @@ export default function index() {
               This is the modal content
             </Text>
             <View className="flex flex-row justify-around items-center py-3">
-              <TouchableOpacity
-                className="flex flex-col items-center"
-                onPress={() => {
-                  setShowModal(false);
-                  setTimeout(() => {
-                    router.push("/screens/addcandiates");
-                  }, 1000);
+              <Link
+                // onPress={() => {
+                //   setShowModal(false);
+                //   setTimeout(() => {
+                //     router.push("/screens/addcandiates", {
+                //       id: groupdetails.id,
+                //       name: groupdetails.name,
+                //     });
+                //   }, 1000);
+                // }}
+                href={{
+                  pathname: "/screens/addcandiates",
+                  params: { id: groupdetails.id, name: groupdetails.name },
                 }}
               >
-                <AntDesign name="addusergroup" size={32} color="black" />
-                <Text>Add Candiates</Text>
-              </TouchableOpacity>
+                <View  className="flex flex-col items-center">
+                  <AntDesign name="addusergroup" size={32} color="black" />
+                  <Text>Add Candiates</Text>
+                </View>
+              </Link>
               <TouchableOpacity className="flex flex-col items-center">
                 <AntDesign name="deleteusergroup" size={32} color="black" />
                 <Text>Delete group</Text>
