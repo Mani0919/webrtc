@@ -19,7 +19,7 @@ export default function Root() {
           }}
         />
         <Stack.Screen
-          name="screens"
+          name="[screens]"
           options={{
             headerShown: false,
           }}

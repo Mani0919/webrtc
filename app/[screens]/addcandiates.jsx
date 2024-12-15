@@ -4,6 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,6 +12,8 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import * as Contacts from "expo-contacts";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
 
 export default function Addcandiates() {
   const router = useRouter();
@@ -75,6 +78,17 @@ export default function Addcandiates() {
     });
   };
 
+  const pushCandidates=async()=>
+  {
+    try {
+      const res=await updateDoc(doc(db,"groups",id),{
+        members:addcontacts
+      })
+      Alert.alert("Added")
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <SafeAreaView className="flex-1">
       <TouchableOpacity className="px-10 p-3 " onPress={() => router.back()}>
@@ -83,7 +97,7 @@ export default function Addcandiates() {
       <View className="flex flex-row justify-between items-center px-4">
         <Text className="text-[20px]  my-3">Add candiates to the {name} group</Text>
         {addcontacts.length > 0 && (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={pushCandidates}>
             <AntDesign name="adduser" size={24} color="blue" />
           </TouchableOpacity>
         )}
