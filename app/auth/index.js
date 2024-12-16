@@ -3,7 +3,8 @@ import { Button, StyleSheet, Text, View } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useEffect } from "react";
 import auth from "@react-native-firebase/auth";
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   useEffect(() => {
@@ -39,9 +40,12 @@ export default function App() {
       );
       // console.log(googleCredential.us)
       // Sign-in the user with the credential
-      const userCredential =await auth().signInWithCredential(googleCredential);
-      console.log(userCredential.user)
-
+      const userCredential = await auth().signInWithCredential(
+        googleCredential
+      );
+      console.log(userCredential.user.uid);
+     await AsyncStorage.setItem("userid",userCredential.user.uid)
+      // await AsyncStorage.setItem("user", JSON.stringify(userCredential.user));
       // return user;
     } catch (error) {
       console.log(error);
@@ -65,7 +69,7 @@ export default function App() {
           )
         }
       />
-      
+
       <Button title="sign out" onPress={handleout} />
     </View>
   );

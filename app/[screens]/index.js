@@ -15,6 +15,8 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { collection, addDoc, getDocs, deleteDoc } from "@firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { images } from "../../constants/images";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Entypo from "@expo/vector-icons/Entypo";
 export default function index() {
   const router = useRouter();
   const [groups, setGroups] = useState([]);
@@ -25,10 +27,17 @@ export default function index() {
   });
   useEffect(() => {
     fetchGroups();
+    async function fun() {
+      const user = await AsyncStorage.getItem("userid");
+      console.log("user", user);
+    }
+    fun();
   }, []);
   const fetchGroups = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "groups"));
+      const res = await AsyncStorage.getItem("user");
+      console.log(res);
       const groups = [];
       querySnapshot.forEach((doc) => {
         groups.push({ id: doc.id, ...doc.data() }); // Add ID and document data
@@ -120,23 +129,27 @@ export default function index() {
             <Text className="self-center text-[18px] mb-3">
               This is the modal content
             </Text>
-            <View className="flex flex-row justify-around items-center py-3">
+            <View className="flex flex-row flex-wrap justify-around items-center py-3">
+              <TouchableOpacity
+                className="flex flex-col items-center"
+                // onPress={() => router.push("/[screens]/chat")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/[screens]/chat",
+                    params: { groupid: groupdetails.id },
+                  })
+                }
+              >
+                <Entypo name="chat" size={24} color="black" />
+                <Text>Chat</Text>
+              </TouchableOpacity>
               <Link
-                // onPress={() => {
-                //   setShowModal(false);
-                //   setTimeout(() => {
-                //     router.push("/screens/addcandiates", {
-                //       id: groupdetails.id,
-                //       name: groupdetails.name,
-                //     });
-                //   }, 1000);
-                // }}
                 href={{
                   pathname: "/screens/addcandiates",
                   params: { id: groupdetails.id, name: groupdetails.name },
                 }}
               >
-                <View  className="flex flex-col items-center">
+                <View className="flex flex-col items-center">
                   <AntDesign name="addusergroup" size={32} color="black" />
                   <Text>Add Candiates</Text>
                 </View>

@@ -76,7 +76,7 @@ import {
     const createGroup = async (groupName) => {
       try {
         const groupRef = await addDoc(collection(db, "groups"), {
-          name: groupName, // Only the group name is added
+          name: groupName, 
         });
         console.log("Group created with ID:", groupRef.id);
       } catch (error) {

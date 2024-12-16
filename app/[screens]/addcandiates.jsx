@@ -82,7 +82,7 @@ export default function Addcandiates() {
   {
     try {
       const res=await updateDoc(doc(db,"groups",id),{
-        members:addcontacts
+        members:arrayUnion(...addcontacts)
       })
       Alert.alert("Added")
     } catch (error) {

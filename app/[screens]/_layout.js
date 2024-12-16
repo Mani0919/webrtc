@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 export default function Root() {
   return (
     <>
-      <Stack >
+      <Stack>
         <Stack.Screen
           name="index"
           options={{
@@ -14,6 +14,14 @@ export default function Root() {
         />
         <Stack.Screen
           name="addcandiates"
+          options={{
+            headerShown: false,
+            gestureEnabled: true,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="chat"
           options={{
             headerShown: false,
             gestureEnabled: true,
