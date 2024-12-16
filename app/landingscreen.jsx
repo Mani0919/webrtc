@@ -73,16 +73,7 @@ import {
       filterContacts(); // Trigger the filter when search changes
     }, [search, contacts]);
   
-    const createGroup = async (groupName) => {
-      try {
-        const groupRef = await addDoc(collection(db, "groups"), {
-          name: groupName, 
-        });
-        console.log("Group created with ID:", groupRef.id);
-      } catch (error) {
-        console.error("Error creating group:", error);
-      }
-    };
+ 
     const fetchGroups = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "groups"));
