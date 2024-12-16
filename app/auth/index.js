@@ -1,10 +1,19 @@
 import { StatusBar } from "expo-status-bar";
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useEffect } from "react";
 import auth from "@react-native-firebase/auth";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { images } from "../../constants/images";
+import { router } from "expo-router";
 
 export default function App() {
   useEffect(() => {
@@ -44,7 +53,7 @@ export default function App() {
         googleCredential
       );
       console.log(userCredential.user.uid);
-     await AsyncStorage.setItem("userid",userCredential.user.uid)
+      await AsyncStorage.setItem("userid", userCredential.user.uid);
       // await AsyncStorage.setItem("user", JSON.stringify(userCredential.user));
       // return user;
     } catch (error) {
@@ -52,25 +61,27 @@ export default function App() {
     }
   }
 
-  const handleout = async () => {
-    try {
-      const res = await GoogleSignin.signOut();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleout = async () => {
+  //   try {
+  //     const res = await GoogleSignin.signOut();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   return (
     <View style={styles.container}>
-      <Button
-        title="Google Sign-In"
+      <TouchableOpacity
+        className="flex flex-row items-center justify-between border-gray-400 border-[0.8px] p-2 rounded-3xl"
         onPress={() =>
           onGoogleButtonPress().then(() =>
-            console.log("Signed in with Google!")
+           router.push("/[screens]")
           )
         }
-      />
-
-      <Button title="sign out" onPress={handleout} />
+      >
+        <Image source={images.google} className="w-10 h-10 rounded-full" />
+        <Text className="text-[17px]">Sign in with Google</Text>
+      </TouchableOpacity>
+      {/* <Button title="sign out" onPress={handleout} /> */}
     </View>
   );
 }

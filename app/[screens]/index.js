@@ -67,12 +67,12 @@ export default function index() {
 
   return (
     <SafeAreaView className="flex-1">
-      <TouchableOpacity className="px-5 p-2 " onPress={() => router.back()}>
-        <AntDesign name="enter" size={24} color="black" />
-      </TouchableOpacity>
-      <View>
+      <View className="flex flex-row justify-between items-center mx-3 mt-4">
+        <TouchableOpacity className="px-5 p-2 " onPress={() => router.back()}>
+          <AntDesign name="enter" size={24} color="black" />
+        </TouchableOpacity>
         <TouchableOpacity>
-          <Text>Create group</Text>
+          <AntDesign name="pluscircle" size={24} color="black" />
         </TouchableOpacity>
       </View>
       <View className="flex flex-row items-center px-4 mt-7 justify-start gap-x-3">
@@ -132,7 +132,6 @@ export default function index() {
             <View className="flex flex-row flex-wrap justify-around items-center py-3">
               <TouchableOpacity
                 className="flex flex-col items-center"
-                // onPress={() => router.push("/[screens]/chat")}
                 onPress={() =>
                   router.push({
                     pathname: "/[screens]/chat",
@@ -140,7 +139,7 @@ export default function index() {
                   })
                 }
               >
-                <Entypo name="chat" size={24} color="black" />
+                <Entypo name="chat" size={32} color="black" />
                 <Text>Chat</Text>
               </TouchableOpacity>
               <Link
