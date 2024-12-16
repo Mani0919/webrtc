@@ -5,6 +5,7 @@ import {
   Button,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,7 +18,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 export default function chat() {
   const params = useLocalSearchParams();
   const [messages, setMessages] = useState([]);
@@ -78,12 +79,6 @@ export default function chat() {
 
   return (
     <SafeAreaView className="flex-1">
-      <TextInput
-        placeholder="enter"
-        value={newMessage}
-        onChangeText={setNewMessage}
-      />
-      <Button title="submit" onPress={sendMessage} />
       <ScrollView>
         {messages.map((msg) => (
           <View
@@ -99,6 +94,21 @@ export default function chat() {
           </View>
         ))}
       </ScrollView>
+      <View className="flex flex-row justify-between mx-3 items-center mb-2" >
+        <TextInput
+          placeholder="enter"
+          value={newMessage}
+          onChangeText={setNewMessage}
+          className="border-gray-400 border-[0.8px] p-2 flex-1 rounded-lg"
+        />
+        <TouchableOpacity onPress={sendMessage}>
+          <MaterialCommunityIcons
+            name="send-circle-outline"
+            size={44}
+            color="black"
+          />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
