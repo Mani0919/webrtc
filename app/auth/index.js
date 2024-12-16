@@ -74,7 +74,7 @@ export default function App() {
         className="flex flex-row items-center justify-between border-gray-400 border-[0.8px] p-2 rounded-3xl"
         onPress={() =>
           onGoogleButtonPress().then(() =>
-           router.push("/[screens]")
+           router.push("/landingscreen")
           )
         }
       >

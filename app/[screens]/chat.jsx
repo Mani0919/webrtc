@@ -13,6 +13,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   onSnapshot,
   serverTimestamp,
 } from "firebase/firestore";
@@ -24,19 +26,6 @@ export default function chat() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [userid, setUserid] = useState("");
-
-  const checkGroupAccess = async () => {
-    const groupDoc = await getDoc(doc(db, "groups", groupId));
-    const groupData = groupDoc.data();
-
-    if (!groupData.members.includes(currentUserId)) {
-      alert("You are not a member of this group!");
-      router.back();
-    }
-  };
-  useEffect(() => {
-    checkGroupAccess();
-  }, []);
 
   useEffect(() => {
     async function fun() {
@@ -77,6 +66,18 @@ export default function chat() {
     }
   };
 
+  const checkGroupAccess = async () => {
+    const groupDoc = await getDoc(doc(db, "groups", params.groupid));
+    const groupData = groupDoc.data();
+
+    if (!groupData.members.includes(userid)) {
+      alert("You are not a member of this group!");
+      // router.back();
+    }
+  };
+  useEffect(() => {
+    checkGroupAccess();
+  }, []);
   return (
     <SafeAreaView className="flex-1">
       <ScrollView>
@@ -94,9 +95,9 @@ export default function chat() {
           </View>
         ))}
       </ScrollView>
-      <View className="flex flex-row justify-between mx-3 items-center mb-2" >
+      <View className="flex flex-row justify-between mx-3 items-center mb-2">
         <TextInput
-          placeholder="enter"
+          placeholder="Message"
           value={newMessage}
           onChangeText={setNewMessage}
           className="border-gray-400 border-[0.8px] p-2 flex-1 rounded-lg"

@@ -12,17 +12,19 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import * as Contacts from "expo-contacts";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { doc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Addcandiates() {
   const router = useRouter();
-  const { id, name}=useLocalSearchParams()
+  const { id, name } = useLocalSearchParams();
   console.log("ttt", id, name);
   const [search, setSearch] = useState("");
   const [contacts, setContact] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
   const [addcontacts, setAddcontacts] = useState([]);
+  const [userid, setUserid] = useState("");
   useEffect(() => {
     try {
       const fetchContacts = async () => {
@@ -78,24 +80,36 @@ export default function Addcandiates() {
     });
   };
 
-  const pushCandidates=async()=>
-  {
+  const pushCandidates = async () => {
     try {
-      const res=await updateDoc(doc(db,"groups",id),{
-        members:arrayUnion(...addcontacts)
-      })
-      Alert.alert("Added")
+      const res = await updateDoc(doc(db, "groups", id), {
+        members: arrayUnion(...addcontacts, userid),
+      });
+      Alert.alert("Added");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
+  useEffect(() => {
+    async function fun() {
+      try {
+        const res = await AsyncStorage.getItem("userid");
+        setUserid(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fun();
+  }, []);
   return (
     <SafeAreaView className="flex-1">
       <TouchableOpacity className="px-10 p-3 " onPress={() => router.back()}>
         <AntDesign name="enter" size={24} color="black" />
       </TouchableOpacity>
       <View className="flex flex-row justify-between items-center px-4">
-        <Text className="text-[20px]  my-3">Add candiates to the {name} group</Text>
+        <Text className="text-[20px]  my-3">
+          Add candiates to the {name} group
+        </Text>
         {addcontacts.length > 0 && (
           <TouchableOpacity onPress={pushCandidates}>
             <AntDesign name="adduser" size={24} color="blue" />
