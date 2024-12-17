@@ -25,7 +25,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { mediaDevices, RTCPeerConnection, RTCView } from "react-native-webrtc";
 import firebase from "firebase/compat/app";
-
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 export default function chat() {
   const params = useLocalSearchParams();
   const [messages, setMessages] = useState([]);
@@ -249,6 +250,11 @@ export default function chat() {
             streamURL={localStream.toURL()}
           />
         )}
+        {callStarted && (
+          <TouchableOpacity onPress={endCall} className="-mt-10 self-center">
+            <MaterialIcons name="call-end" size={44} color="red" />
+          </TouchableOpacity>
+        )}
       </View>
       <View>
         {remoteStream && (
@@ -258,7 +264,7 @@ export default function chat() {
           />
         )}
       </View>
-      <View>
+      {/* <View>
         <View
           style={{
             marginTop: 20,
@@ -266,24 +272,29 @@ export default function chat() {
             justifyContent: "space-around",
           }}
         >
-          {/* {!callStarted ? ( */}
-          <TouchableOpacity onPress={startCall}>
-            <Text>Start Call</Text>
-          </TouchableOpacity>
-          {/* ) : ( */}
-          <TouchableOpacity onPress={endCall}>
-            <Text>End Call</Text>
-          </TouchableOpacity>
-          {/* )} */}
+          {callStarted && (
+            <TouchableOpacity onPress={endCall}>
+              <Text>End Call</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </View>
+      </View> */}
       <View className="flex flex-row justify-between mx-3 items-center mb-2">
         <TextInput
           placeholder="Message"
           value={newMessage}
           onChangeText={setNewMessage}
-          className="border-gray-400 border-[0.8px] p-2 flex-1 rounded-lg"
+          className="border-gray-400 border-[0.8px] p-2 flex-1 rounded-lg mr-3"
         />
+        <TouchableOpacity
+          onPress={() => {
+            setCallStarted(true);
+            startCall();
+          }}
+          className="mr-2"
+        >
+          <FontAwesome name="video-camera" size={34} color="black" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={sendMessage}>
           <MaterialCommunityIcons
             name="send-circle-outline"

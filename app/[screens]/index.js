@@ -96,7 +96,10 @@ export default function index() {
       console.error("Error deleting group:", error);
     }
   };
-
+  const getMembersByGroupId = (groupId) => {
+    const group = groups.find((group) => group.id === groupId);
+    return group ? group.members : null; // Return the members if group is found, else return null
+  };
   return (
     <SafeAreaView className="flex-1">
       <View className="flex flex-row justify-between items-center mx-3 mt-4">
@@ -166,18 +169,20 @@ export default function index() {
               {groupdetails.name} group
             </Text>
             <View className="flex flex-row flex-wrap justify-around items-center py-3">
-              <TouchableOpacity
-                className="flex flex-col items-center"
-                onPress={() =>
-                  router.push({
-                    pathname: "/[screens]/chat",
-                    params: { groupid: groupdetails.id },
-                  })
-                }
-              >
-                <Entypo name="chat" size={32} color="black" />
-                <Text>Chat</Text>
-              </TouchableOpacity>
+              {getMembersByGroupId(groupdetails.id) && (
+                <TouchableOpacity
+                  className="flex flex-col items-center"
+                  onPress={() =>
+                    router.push({
+                      pathname: "/[screens]/chat",
+                      params: { groupid: groupdetails.id },
+                    })
+                  }
+                >
+                  <Entypo name="chat" size={32} color="black" />
+                  <Text>Chat</Text>
+                </TouchableOpacity>
+              )}
               <Link
                 href={{
                   pathname: "/screens/addcandiates",
