@@ -13,11 +13,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link, router, useRouter } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "@firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  getDoc,
+} from "@firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { images } from "../../constants/images";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 export default function index() {
   const router = useRouter();
   const [groups, setGroups] = useState([]);
@@ -28,10 +36,12 @@ export default function index() {
     id: "",
     name: "",
   });
+  const [user, setUser] = useState("");
   useEffect(() => {
     fetchGroups();
     async function fun() {
       const user = await AsyncStorage.getItem("userid");
+      setUser(user);
       console.log("user", user);
     }
     fun();
@@ -40,12 +50,11 @@ export default function index() {
     try {
       const querySnapshot = await getDocs(collection(db, "groups"));
       const res = await AsyncStorage.getItem("user");
-      console.log(res);
       const groups = [];
       querySnapshot.forEach((doc) => {
         groups.push({ id: doc.id, ...doc.data() }); // Add ID and document data
       });
-      console.log(groups);
+      console.log("groups", groups);
       setGroups(groups); // Return fetched groups
     } catch (error) {
       console.error("Error fetching groups:", error);
@@ -87,6 +96,7 @@ export default function index() {
       console.error("Error deleting group:", error);
     }
   };
+
   return (
     <SafeAreaView className="flex-1">
       <View className="flex flex-row justify-between items-center mx-3 mt-4">
@@ -108,26 +118,26 @@ export default function index() {
       {groups.length === 0 ? (
         <Text>No groups found</Text>
       ) : (
-        <FlatList
-          data={groups}
-          keyExtractor={(item) => item.id}
-          className="p-3 mt-7"
-          renderItem={({ item }) => (
+        <View className="flex flex-row flex-wrap items-center">
+          {groups.map((item) => (
             <TouchableOpacity
-              className=" h-10"
+              key={item.id}
+              className="h-14 bg-blue-400 m-2 p-2 rounded-lg" // Added margin for spacing
               onPress={() => {
                 handleOpenModal(item.id, item.name);
               }}
             >
-              <View className="flex flex-row items-center gap-x-3 w-32 h-full ">
-                {item.name == "family" && (
+              <View className="flex flex-row items-center gap-x-3 w-32 h-full">
+                {item.name === "family" ? (
                   <Image source={images.family} className="w-7 h-7" />
+                ) : (
+                  <FontAwesome6 name="user-group" size={24} color="black" />
                 )}
                 <Text className="text-[20px]">{item.name}</Text>
               </View>
             </TouchableOpacity>
-          )}
-        />
+          ))}
+        </View>
       )}
 
       <Modal
