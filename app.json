@@ -2,7 +2,7 @@
   "expo": {
     "name": "cumapp",
     "slug": "cumapp",
-    "scheme":"cumapp",
+    "scheme": "cumapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -31,7 +31,13 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+        }
+      ]
     ]
   }
 }

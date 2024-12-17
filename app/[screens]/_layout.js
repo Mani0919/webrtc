@@ -13,20 +13,21 @@ export default function Root() {
           }}
         />
         <Stack.Screen
-          name="auth"
+          name="addcandiates"
           options={{
             headerShown: false,
+            gestureEnabled: true,
+            animation: "slide_from_right",
           }}
         />
         <Stack.Screen
-          name="[screens]"
+          name="chat"
           options={{
             headerShown: false,
+            gestureEnabled: true,
+            animation: "slide_from_right",
           }}
         />
-        <Stack.Screen name="landingscreen" options={{
-          headerShown:false
-        }}/>
       </Stack>
     </>
   );
