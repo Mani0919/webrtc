@@ -26,7 +26,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { mediaDevices, RTCPeerConnection, RTCView } from "react-native-webrtc";
 import firebase from "firebase/compat/app";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 export default function chat() {
   const params = useLocalSearchParams();
   const [messages, setMessages] = useState([]);
@@ -61,7 +61,8 @@ export default function chat() {
         return {
           id: doc.id,
           ...data,
-          readableDate, // Add readable date
+          readableDate,
+          senderName: data.senderName || "Unknown",
         };
       });
       setMessages(orderedMessages);
@@ -89,7 +90,7 @@ export default function chat() {
   };
 
   // Start Call Method
-  
+
   const startCall = async () => {
     const localStream = await getUserMedia();
     setLocalStream(localStream);
@@ -169,7 +170,8 @@ export default function chat() {
 
     try {
       await addDoc(collection(db, "messages", params.groupid, "chat"), {
-        senderId: await AsyncStorage.getItem("userid"), // Replace with your logged-in user's ID
+        senderId: await AsyncStorage.getItem("userid"),
+        senderName: (await AsyncStorage.getItem("userName")) || "Unknown", // Replace with your logged-in user's ID
         content: newMessage,
         createdAt: serverTimestamp(),
         date: formattedDate,
@@ -207,9 +209,22 @@ export default function chat() {
     if (!acc[formattedDate]) {
       acc[formattedDate] = [];
     }
-    acc[formattedDate].push(msg);
+
+    // Check if the last message in the group is from the same sender
+    const lastGroup = acc[formattedDate][acc[formattedDate].length - 1];
+    if (lastGroup && lastGroup.senderId === msg.senderId) {
+      lastGroup.messages.push(msg); // Add message to the existing group
+    } else {
+      acc[formattedDate].push({
+        senderId: msg.senderId,
+        senderName: msg.senderName,
+        messages: [msg], // Start a new group for this sender
+      });
+    }
+
     return acc;
   }, {});
+
   return (
     <SafeAreaView className="flex-1 relative">
       <ScrollView className="flex-1">
@@ -223,27 +238,36 @@ export default function chat() {
                 {date}
               </Text>
 
-              {groupedMessages[date].map((msg) => (
-                <View
-                  key={msg.id}
-                  style={
-                    msg.senderId === userid
-                      ? styles.myMessage
-                      : styles.theirMessage
-                  }
-                >
-                  <Text>{msg.content}</Text>
-                  <Text style={styles.timestamp}>
-                    {new Date(
-                      msg.createdAt?.seconds * 1000
-                    ).toLocaleTimeString()}
+              {groupedMessages[date].map((group, index) => (
+                <View key={`${date}-${index}`} style={{ marginVertical: 10 }}>
+                  {/* Display sender's name only once per group */}
+                  <Text style={{ fontWeight: "bold", marginBottom: 5 }} className="self-center">
+                    {group.senderName}
                   </Text>
+                  {group.messages.map((msg) => (
+                    <View
+                      key={msg.id}
+                      style={
+                        msg.senderId === userid
+                          ? styles.myMessage
+                          : styles.theirMessage
+                      }
+                    >
+                      <Text>{msg.content}</Text>
+                      <Text style={styles.timestamp}>
+                        {new Date(
+                          msg.createdAt?.seconds * 1000
+                        ).toLocaleTimeString()}
+                      </Text>
+                    </View>
+                  ))}
                 </View>
               ))}
             </View>
           ))}
         </View>
       </ScrollView>
+
       <View className="">
         {localStream && (
           <RTCView

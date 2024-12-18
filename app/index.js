@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React, { useEffect } from "react";
 import { Redirect, router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function index() {
   useEffect(() => {
@@ -8,9 +9,9 @@ export default function index() {
       try {
         const res = await AsyncStorage.getItem("token");
         if (res) {
-          router.push("/home");
+          router.push("/landingscreen");
         } else {
-          router.push("/signin");
+          router.push("/auth");
         }
       } catch (error) {
         console.log(error);

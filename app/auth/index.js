@@ -52,8 +52,9 @@ export default function App() {
       const userCredential = await auth().signInWithCredential(
         googleCredential
       );
-      console.log(userCredential.user.uid);
+      console.log(userCredential.user);
       await AsyncStorage.setItem("userid", userCredential.user.uid);
+      await AsyncStorage.setItem("userName", userCredential.user.displayName);
       // await AsyncStorage.setItem("user", JSON.stringify(userCredential.user));
       // return user;
     } catch (error) {
@@ -73,9 +74,7 @@ export default function App() {
       <TouchableOpacity
         className="flex flex-row items-center justify-between border-gray-400 border-[0.8px] p-2 rounded-3xl"
         onPress={() =>
-          onGoogleButtonPress().then(() =>
-           router.push("/landingscreen")
-          )
+          onGoogleButtonPress().then(() => router.push("/landingscreen"))
         }
       >
         <Image source={images.google} className="w-10 h-10 rounded-full" />
