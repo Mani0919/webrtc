@@ -89,6 +89,7 @@ export default function chat() {
   };
 
   // Start Call Method
+  
   const startCall = async () => {
     const localStream = await getUserMedia();
     setLocalStream(localStream);
