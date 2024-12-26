@@ -26,6 +26,7 @@ import { images } from "../../constants/images";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import * as Contacts from "expo-contacts";
 export default function index() {
   const router = useRouter();
   const [groups, setGroups] = useState([]);
@@ -46,6 +47,37 @@ export default function index() {
     }
     fun();
   }, []);
+
+  // const fetchGroups = async () => {
+  //   try {
+  //     console.log("start")
+  //     const userid = await AsyncStorage.getItem("userid");
+  //     const userCandidateID = await getUserCandidateID(); // Fetch candidate ID
+  //     console.log("cccc",userCandidateID)
+  //     const querySnapshot = await getDocs(collection(db, "groups"));
+  //     const groups = [];
+
+  //     querySnapshot.forEach((doc) => {
+  //       const data = doc.data();
+
+  //       // Ensure `contactMembers` is always treated as an array
+  //       const contactMembers = data.contactMembers || [];
+
+  //       const isMember =
+  //         data.members.some((member) => member.uid === userid) || // Check if user is a member by uid
+  //         contactMembers.includes(userCandidateID); // Check by candidate ID
+
+  //       if (isMember) {
+  //         groups.push({ id: doc.id, ...data });
+  //       }
+  //     });
+
+  //     console.log("Groups:", groups);
+  //     setGroups(groups); // Update state with filtered groups
+  //   } catch (error) {
+  //     console.error("Error fetching groups:", error);
+  //   }
+  // };
   const fetchGroups = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "groups"));
@@ -60,6 +92,28 @@ export default function index() {
       console.error("Error fetching groups:", error);
       return [];
     }
+  };
+  const getUserCandidateID = async () => {
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status === "granted") {
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.Emails],
+      });
+
+      console.log("Contacts Data:", data);
+
+      // Get the user's email from the sign-in process
+      const userEmail = await AsyncStorage.getItem("userEmail"); // Save this during login
+
+      // Match the contact by email
+      const userContact = data.find((contact) =>
+        contact.emails?.some((email) => email.email === userEmail)
+      );
+
+      console.log("User Contact:", userContact);
+      return userContact ? userContact.id : null; // Return the contact ID if found
+    }
+    return null;
   };
 
   const handleOpenModal = (id, name) => {
@@ -79,8 +133,13 @@ export default function index() {
 
   const createGroup = async () => {
     try {
+      const userid = await AsyncStorage.getItem("userid");
+      const userName = await AsyncStorage.getItem("userName"); // Optional, for displaying creator name
       const groupRef = await addDoc(collection(db, "groups"), {
         name: newgroupname,
+        creator: userid, // Creator's Firebase uid
+        members: [{ uid: userid, name: userName }], // Add creator as a member
+        contactMembers: [], // Will hold candidateIDs
       });
       console.log("Group created with ID:", groupRef.id);
     } catch (error) {
@@ -127,7 +186,11 @@ export default function index() {
               key={item.id}
               className="h-14 bg-blue-400 m-2 p-2 rounded-lg" // Added margin for spacing
               onPress={() => {
-                handleOpenModal(item.id, item.name);
+                // if (item.creator === user) {
+                  handleOpenModal(item.id, item.name);
+                // } else {
+                  // router.push("/[screens]/chat");
+                // }
               }}
             >
               <View className="flex flex-row items-center gap-x-3 w-32 h-full">

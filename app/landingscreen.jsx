@@ -19,6 +19,9 @@ import { collection, addDoc, getDocs } from "@firebase/firestore";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Spinner from "react-native-loading-spinner-overlay";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 export default function index() {
   const [contacts, setContact] = useState([]);
   const [search, setSearch] = useState("");
@@ -96,24 +99,44 @@ export default function index() {
       );
     }
   };
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        "834495022514-o5l8l838a65l4d3laf7af76gv68fl064.apps.googleusercontent.com",
+    });
+  }, []);
+  const handelOut = async () => {
+    try {
+      const res = await GoogleSignin.signOut();
+      router.push("/auth");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <SafeAreaView className="flex-1">
       <Spinner visible={spin} />
-      <TouchableOpacity
-        className="flex flex-row items-center justify-end px-7 p-2 mt-5"
-        onPress={() => {
-          console.log("push");
-          router.push("/screens");
-        }}
-      >
-        <Text className="text-[15px]">Groups</Text>
-        <AntDesign
-          name="enter"
-          size={24}
-          color="black"
-          style={{ transform: [{ rotate: "-180deg" }] }}
-        />
-      </TouchableOpacity>
+      <View className="flex flex-row justify-between items-center ">
+        <TouchableOpacity onPress={handelOut}>
+          <Text>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex flex-row items-center justify-end px-7 p-2 mt-5"
+          onPress={() => {
+            console.log("push");
+            router.push("/screens");
+          }}
+        >
+          <Text className="text-[15px]">Groups</Text>
+          <AntDesign
+            name="enter"
+            size={24}
+            color="black"
+            style={{ transform: [{ rotate: "-180deg" }] }}
+          />
+        </TouchableOpacity>
+      </View>
+
       <View className="bg-gray-400 mx-3 rounded-md p-2">
         <TextInput
           placeholder="search"
@@ -122,41 +145,12 @@ export default function index() {
         />
       </View>
 
-      {/* <View className="flex-1 mx-4 p-2">
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-            {filteredContacts.length > 0 ? (
-              filteredContacts.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className="my-2 py-3 bg-gray-300 flex flex-row justify-between items-center px-6 rounded-md"
-                  onPress={() => handleCall(item.phoneNumbers?.[0]?.number)}
-                >
-                  <View className=" flex flex-row items-center gap-x-4">
-                    <FontAwesome6 name="user-circle" size={27} color="black" />
-                    <View className="flex flex-col gap-y-2">
-                      <Text className="text-[17px] font-semibold">
-                        {item.name}
-                      </Text>
-                      <Text>{item.phoneNumbers?.[0]?.number}</Text>
-                    </View>
-                  </View>
-                  <MaterialIcons name="call" size={24} color="#3cb05b" />
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text>No contacts found</Text>
-            )}
-          </ScrollView>
-        </View> */}
       <View className="mx-4">
         <FlatList
           data={filteredContacts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              className="my-2 py-3 bg-gray-300 flex flex-row justify-between items-center px-6 rounded-md"
-              onPress={() => handleCall(item.phoneNumbers?.[0]?.number)}
-            >
+            <View className="my-2 py-3 bg-gray-300 flex flex-row justify-between items-center px-6 rounded-md">
               <View className="flex flex-row items-center gap-x-4">
                 <FontAwesome6 name="user-circle" size={27} color="black" />
                 <View className="flex flex-col gap-y-2">
@@ -164,8 +158,29 @@ export default function index() {
                   <Text>{item.phoneNumbers?.[0]?.number}</Text>
                 </View>
               </View>
-              <MaterialIcons name="call" size={24} color="#3cb05b" />
-            </TouchableOpacity>
+              <View className="flex flex-row gap-x-2 items-center">
+                <MaterialIcons
+                  name="call"
+                  size={24}
+                  color="#3cb05b"
+                  onPress={() => handleCall(item.phoneNumbers?.[0]?.number)}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    AsyncStorage.setItem(
+                      "phone",
+                      item.phoneNumbers?.[0]?.number
+                    );
+                    router.push({
+                      pathname: "/videocall",
+                      params: { phone: item.phoneNumbers?.[0]?.number },
+                    });
+                  }}
+                >
+                  <FontAwesome name="video-camera" size={24} color="black" />
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
           ListEmptyComponent={<Text>No contacts found</Text>}
         />

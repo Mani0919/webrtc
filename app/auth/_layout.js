@@ -7,6 +7,12 @@ export default function Root() {
     <>
       <Stack>
         <Stack.Screen
+          name="details"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="index"
           options={{
             headerShown: false,

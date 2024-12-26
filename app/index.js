@@ -8,8 +8,9 @@ export default function index() {
     async function fun() {
       try {
         const res = await AsyncStorage.getItem("token");
+        console.log("first", res);
         if (res) {
-          router.push("/landingscreen");
+          router.push("/auth/details");
         } else {
           router.push("/auth");
         }

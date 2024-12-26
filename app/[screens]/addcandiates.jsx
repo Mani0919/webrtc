@@ -83,7 +83,7 @@ export default function Addcandiates() {
   const pushCandidates = async () => {
     try {
       const res = await updateDoc(doc(db, "groups", id), {
-        members: arrayUnion(...addcontacts, userid),
+        members: arrayUnion(...addcontacts),
       });
       Alert.alert("Added");
     } catch (error) {

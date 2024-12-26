@@ -183,19 +183,6 @@ export default function chat() {
     }
   };
 
-  // const checkGroupAccess = async () => {
-  //   const groupDoc = await getDoc(doc(db, "groups", params.groupid));
-  //   const groupData = groupDoc.data();
-
-  //   if (!groupData.members.includes(userid)) {
-  //     alert("You are not a member of this group!");
-  //     // router.back();
-  //   }
-  // };
-  // useEffect(() => {
-  //   checkGroupAccess();
-
-  // }, []);
   const groupedMessages = messages.reduce((acc, msg) => {
     const messageDate = new Date(msg.createdAt?.seconds * 1000);
     const formattedDate = `${String(messageDate.getDate()).padStart(
@@ -289,21 +276,6 @@ export default function chat() {
           />
         )}
       </View>
-      {/* <View>
-        <View
-          style={{
-            marginTop: 20,
-            flexDirection: "row",
-            justifyContent: "space-around",
-          }}
-        >
-          {callStarted && (
-            <TouchableOpacity onPress={endCall}>
-              <Text>End Call</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View> */}
       <View className="flex flex-row justify-between mx-3 items-center mb-2">
         <TextInput
           placeholder="Message"
@@ -311,15 +283,6 @@ export default function chat() {
           onChangeText={setNewMessage}
           className="border-gray-400 border-[0.8px] p-2 flex-1 rounded-lg mr-3"
         />
-        <TouchableOpacity
-          onPress={() => {
-            setCallStarted(true);
-            startCall();
-          }}
-          className="mr-2"
-        >
-          <FontAwesome name="video-camera" size={34} color="black" />
-        </TouchableOpacity>
         <TouchableOpacity onPress={sendMessage}>
           <MaterialCommunityIcons
             name="send-circle-outline"

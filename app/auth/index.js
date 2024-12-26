@@ -8,14 +8,16 @@ import {
   View,
 } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import auth from "@react-native-firebase/auth";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { images } from "../../constants/images";
 import { router } from "expo-router";
+import Spinner from "react-native-loading-spinner-overlay";
 
 export default function App() {
+  const [spin,setSpin]=useState(false)
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -30,10 +32,12 @@ export default function App() {
         showPlayServicesUpdateDialog: true,
       });
       // Get the users ID token
+      setSpin(true)
       const signInResult = await GoogleSignin.signIn();
 
       // Try the new style of google-sign in result, from v13+ of that module
       idToken = signInResult.data?.idToken;
+      AsyncStorage.setItem("token", idToken);
       console.log(idToken);
       if (!idToken) {
         // if you are using older versions of google-signin, try old style result
@@ -55,32 +59,31 @@ export default function App() {
       console.log(userCredential.user);
       await AsyncStorage.setItem("userid", userCredential.user.uid);
       await AsyncStorage.setItem("userName", userCredential.user.displayName);
+      await AsyncStorage.setItem("userEmail", userCredential.user.email);
       // await AsyncStorage.setItem("user", JSON.stringify(userCredential.user));
       // return user;
     } catch (error) {
       console.log(error);
     }
+    finally{
+      setSpin(false)
+    }
   }
 
-  // const handleout = async () => {
-  //   try {
-  //     const res = await GoogleSignin.signOut();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
   return (
     <View style={styles.container}>
+      <Spinner visible={spin}/>
       <TouchableOpacity
         className="flex flex-row items-center justify-between border-gray-400 border-[0.8px] p-2 rounded-3xl"
         onPress={() =>
-          onGoogleButtonPress().then(() => router.push("/landingscreen"))
+          onGoogleButtonPress().then(() => router.push("/auth/details"))
         }
       >
         <Image source={images.google} className="w-10 h-10 rounded-full" />
         <Text className="text-[17px]">Sign in with Google</Text>
       </TouchableOpacity>
-      {/* <Button title="sign out" onPress={handleout} /> */}
+      <Button title="sign out"  />
     </View>
   );
 }
